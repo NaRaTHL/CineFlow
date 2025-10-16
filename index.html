@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineScope – Discover. Watch. Review.</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #0b0b0b;
+      color: #fff;
+    }
+    .movie-scroller::-webkit-scrollbar {
+      height: 8px;
+    }
+    .movie-scroller::-webkit-scrollbar-thumb {
+      background: #e50914;
+      border-radius: 10px;
+    }
+    .hero-section {
+      background: linear-gradient(rgba(0,0,0,.7), rgba(0,0,0,.7)),
+                  url('https://image.tmdb.org/t/p/original/5hNcsnMkwU2LknLoru73c76el3z.jpg');
+      background-size: cover;
+      background-position: center;
+    }
+  </style>
+</head>
+
+<body class="antialiased">
+
+  <!-- Header -->
+  <header class="bg-black/80 backdrop-blur-sm fixed top-0 left-0 right-0 z-50">
+    <nav class="container mx-auto px-4 flex justify-between items-center h-20">
+      <a href="#" class="text-3xl font-bold">Cine<span class="text-red-600">Scope</span></a>
+
+      <div class="hidden md:flex space-x-8 items-center">
+        <!-- Movies Dropdown -->
+        <div class="relative group">
+          <button class="hover:text-red-600">Movies ▾</button>
+          <div class="absolute bg-gray-900 rounded-md shadow-lg w-40 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition">
+            <a href="#" class="block px-4 py-2 hover:bg-red-600">Released</a>
+            <a href="#" class="block px-4 py-2 hover:bg-red-600">Popular</a>
+            <a href="#" class="block px-4 py-2 hover:bg-red-600">Now Showing</a>
+            <a href="#" class="block px-4 py-2 hover:bg-red-600">Upcoming</a>
+          </div>
+        </div>
+
+        <!-- TV Shows Dropdown -->
+        <div class="relative group">
+          <button class="hover:text-red-600">TV Shows ▾</button>
+          <div class="absolute bg-gray-900 rounded-md shadow-lg w-40 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition">
+            <a href="#" class="block px-4 py-2 hover:bg-red-600">Released</a>
+            <a href="#" class="block px-4 py-2 hover:bg-red-600">Popular</a>
+            <a href="#" class="block px-4 py-2 hover:bg-red-600">Now Showing</a>
+            <a href="#" class="block px-4 py-2 hover:bg-red-600">Upcoming</a>
+          </div>
+        </div>
+
+        <!-- Actors Dropdown -->
+        <div class="relative group">
+          <button class="hover:text-red-600">Actors ▾</button>
+          <div class="absolute bg-gray-900 rounded-md shadow-lg w-40 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition">
+            <a href="#" class="block px-4 py-2 hover:bg-red-600">By Name</a>
+          </div>
+        </div>
+
+        <!-- Search -->
+        <button id="searchBtn" class="hover:text-red-600">
+          <svg class="w-6 h-6 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 10-14 0 7 7 0 0014 0z"/></svg>
+        </button>
+
+        <!-- Profile -->
+        <div class="relative group">
+          <button class="hover:text-red-600">
+            <svg class="w-8 h-8 rounded-full bg-gray-700 p-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14a7 7 0 00-7 7h14a7 7 0 00-7-7zM12 12a4 4 0 100-8 4 4 0 000 8z"/></svg>
+          </button>
+          <div class="absolute right-0 bg-gray-900 rounded-md shadow-lg w-40 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition">
+            <a href="#" class="block px-4 py-2 hover:bg-red-600">Profile</a>
+            <a href="#" class="block px-4 py-2 hover:bg-red-600">Settings</a>
+            <a href="#" class="block px-4 py-2 hover:bg-red-600">Logout</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero-section h-screen flex flex-col items-center justify-center text-center px-4">
+    <h1 class="text-5xl md:text-7xl font-bold mb-4">Discover. Watch. Review.</h1>
+    <p class="text-gray-300 mb-8 max-w-2xl">Find ratings, reviews, and recommendations for movies and TV shows.</p>
+    <div class="relative w-full max-w-lg">
+      <input id="searchInput" type="text" placeholder="Search movies, TV shows, actors..." class="w-full py-4 pl-6 pr-16 rounded-full bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-600">
+      <button id="searchSubmit" class="absolute right-2 top-1/2 -translate-y-1/2 bg-red-600 p-3 rounded-full hover:bg-red-700">
+        <svg class="w-5 h-5" fill="none" stroke="white" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 10-14 0 7 7 0 0014 0z"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- Movie Sections -->
+  <main class="container mx-auto px-4 py-16 space-y-16">
+    <section>
+      <h2 class="text-3xl font-semibold mb-6">Recommended Movies</h2>
+      <div id="recommended" class="movie-scroller flex space-x-6 overflow-x-auto pb-4"></div>
+    </section>
+
+    <section>
+      <h2 class="text-3xl font-semibold mb-6">Popular Movies</h2>
+      <div id="popular" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6"></div>
+    </section>
+
+    <section>
+      <h2 class="text-3xl font-semibold mb-6">Upcoming Movies</h2>
+      <div id="upcoming" class="movie-scroller flex space-x-6 overflow-x-auto pb-4"></div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 border-t border-gray-800 py-8 text-center text-gray-400 text-sm">
+    © 2025 CineScope. All Rights Reserved.
+  </footer>
+
+  <!-- JS -->
+  <script>
+    const API_KEY = 'YOUR_TMDB_API_KEY_HERE';
+    const BASE_URL = 'https://api.themoviedb.org/3';
+    const IMG_URL = 'https://image.tmdb.org/t/p/w500';
+
+    async function fetchMovies(endpoint) {
+      const res = await fetch(`${BASE_URL}${endpoint}?api_key=${API_KEY}&language=en-US&page=1`);
+      const data = await res.json();
+      return data.results;
+    }
+
+    function renderMovies(movies, containerId, horizontal = false) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+      movies.forEach(movie => {
+        const imgSrc = movie.poster_path ? `${IMG_URL}${movie.poster_path}` : 'https://placehold.co/400x600?text=No+Image';
+        const html = `
+          <div class="${horizontal ? 'flex-shrink-0 w-48' : ''} group cursor-pointer">
+            <div class="overflow-hidden rounded-lg shadow-lg relative">
+              <img src="${imgSrc}" alt="${movie.title}" class="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-110">
+              <div class="absolute inset-0 bg-black/30"></div>
+            </div>
+            <h3 class="mt-3 text-lg font-medium truncate">${movie.title}</h3>
+            <div class="flex items-center text-sm text-gray-400 mt-1">
+              <svg class="w-4 h-4 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292..."></path>
+              </svg>
+              <span>${movie.vote_average.toFixed(1)}</span>
+            </div>
+          </div>
+        `;
+        container.insertAdjacentHTML('beforeend', html);
+      });
+    }
+
+    async function loadAllMovies() {
+      const [recommended, popular, upcoming] = await Promise.all([
+        fetchMovies('/movie/top_rated'),
+        fetchMovies('/movie/popular'),
+        fetchMovies('/movie/upcoming')
+      ]);
+
+      renderMovies(recommended.slice(0, 10), 'recommended', true);
+      renderMovies(popular.slice(0, 12), 'popular');
+      renderMovies(upcoming.slice(0, 10), 'upcoming', true);
+    }
+
+    async function handleSearch(query) {
+      const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
+      const data = await res.json();
+      renderMovies(data.results.slice(0, 12), 'popular');
+      window.scrollTo({ top: document.getElementById('popular').offsetTop, behavior: 'smooth' });
+    }
+
+    document.getElementById('searchSubmit').addEventListener('click', () => {
+      const query = document.getElementById('searchInput').value.trim();
+      if (query) handleSearch(query);
+    });
+
+    loadAllMovies();
+  </script>
+</body>
+</html>
