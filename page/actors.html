@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineScope | Actors</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-black text-white font-[Poppins]">
+
+  <!-- Header -->
+  <div id="header-placeholder"></div>
+
+  <!-- Main -->
+  <main class="pt-28 container mx-auto px-4">
+    <!-- Title + Sort + Search -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-10 gap-4">
+      <h1 class="text-3xl font-semibold">Actors</h1>
+      <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+        <div class="flex items-center gap-3">
+          <label for="sortSelect" class="text-gray-300 text-sm">Sort by:</label>
+          <select id="sortSelect"
+            class="bg-[#1a2238] border border-gray-700 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-red-600">
+            <option value="az">A → Z</option>
+            <option value="za">Z → A</option>
+          </select>
+        </div>
+        <div class="relative w-full sm:w-64 mt-2 sm:mt-0">
+          <input id="searchInput" type="text" placeholder="Search actors..."
+            class="w-full py-2 pl-4 pr-10 rounded-full bg-[#1a2238] border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-600 text-white text-sm placeholder-gray-400">
+          <button id="searchSubmit"
+            class="absolute right-2 top-1/2 -translate-y-1/2 bg-red-600 p-2 rounded-full hover:bg-red-700">
+            <svg class="w-4 h-4" fill="none" stroke="white" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 10-14 0 7 7 0 0014 0z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actors Grid -->
+    <div id="actorsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"></div>
+
+    <!-- Pagination -->
+    <div id="pagination" class="flex justify-center items-center gap-4 mt-10">
+      <button id="prevPage" class="bg-gray-800 px-4 py-2 rounded-lg hover:bg-gray-700 disabled:opacity-50">Prev</button>
+      <span id="pageIndicator" class="text-gray-400 text-sm"></span>
+      <button id="nextPage" class="bg-gray-800 px-4 py-2 rounded-lg hover:bg-gray-700 disabled:opacity-50">Next</button>
+    </div>
+  </main>
+
+  <footer class="bg-gray-900 border-t border-gray-800 py-8 text-center text-gray-400 text-sm mt-16">
+    © 2025 CineScope. All Rights Reserved.
+  </footer>
+
+  <script src="../js/header.js" defer></script>
+  <script src="../js/actors.js" defer></script>
+</body>
+</html>

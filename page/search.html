@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineScope | Search Results</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body class="bg-black text-white font-[Poppins]">
+
+  <!-- Header -->
+  <div id="header-placeholder"></div>
+
+  <!-- Results -->
+  <main class="pt-24 container mx-auto px-4">
+    <h1 id="resultsTitle" class="text-3xl font-semibold mb-8 text-left"></h1>
+    <div id="resultsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"></div>
+
+    <!-- Pagination -->
+    <div id="pagination" class="flex justify-center items-center gap-4 mt-10 hidden">
+      <button id="prevPage" class="bg-gray-800 px-4 py-2 rounded-lg hover:bg-gray-700 disabled:opacity-50" disabled>Prev</button>
+      <span id="pageIndicator" class="text-gray-400 text-sm"></span>
+      <button id="nextPage" class="bg-gray-800 px-4 py-2 rounded-lg hover:bg-gray-700 disabled:opacity-50" disabled>Next</button>
+    </div>
+  </main>
+
+  <footer class="bg-gray-900 border-t border-gray-800 py-8 text-center text-gray-400 text-sm mt-16">
+    © 2025 CineScope. All Rights Reserved.
+  </footer>
+
+  <!-- Load header & global search logic -->
+  <script src="../js/header.js" defer></script>
+  <script src="../js/script.js" defer></script>
+
+  <!-- Page-specific JS -->
+  <script src="../js/search.js" defer></script>
+
+</body>
+</html>

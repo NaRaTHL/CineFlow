@@ -1,0 +1,192 @@
+document.addEventListener("DOMContentLoaded", () => {
+  const API_KEY = 'e03962f7d0373121b4abd521402d77ae';
+  const BASE_URL = 'https://api.themoviedb.org/3';
+  const IMG_URL = 'https://image.tmdb.org/t/p/w500';
+
+  const grid = document.getElementById('tvGrid');
+  const sortSelect = document.getElementById('sortSelect');
+  const prevBtn = document.getElementById('prevPage');
+  const nextBtn = document.getElementById('nextPage');
+  const pageIndicator = document.getElementById('pageIndicator');
+
+  const params = new URLSearchParams(window.location.search);
+  const category = params.get('category') || 'popular';
+
+  let allTV = [];
+  let currentPage = 1;
+  const showsPerPage = 20;
+  const pagesToFetch = 5;
+  let totalPages = 1;
+
+  // --- LocalStorage helpers ---
+  function toggleInList(listKey, item) {
+    const list = JSON.parse(localStorage.getItem(listKey)) || [];
+    const index = list.findIndex(i => i.id === item.id);
+    if (index >= 0) list.splice(index, 1);
+    else list.push(item);
+    localStorage.setItem(listKey, JSON.stringify(list));
+  }
+
+  function isInList(listKey, id) {
+    const list = JSON.parse(localStorage.getItem(listKey)) || [];
+    return list.some(item => item.id === id);
+  }
+
+  // --- Fetch TV shows ---
+  async function fetchAllTV() {
+    grid.innerHTML = `<p class="text-gray-400 text-center col-span-full">Loading TV shows...</p>`;
+    allTV = [];
+
+    try {
+      for (let page = 1; page <= pagesToFetch; page++) {
+        let endpoint;
+        if (category === 'trending') {
+          endpoint = `${BASE_URL}/trending/tv/week?api_key=${API_KEY}&page=${page}`;
+        } else {
+          endpoint = `${BASE_URL}/tv/${category}?api_key=${API_KEY}&language=en-US&page=${page}`;
+        }
+
+        const res = await fetch(endpoint);
+        const data = await res.json();
+        allTV.push(...data.results);
+      }
+
+      allTV.sort((a, b) => (b.vote_average || 0) - (a.vote_average || 0));
+      totalPages = Math.ceil(allTV.length / showsPerPage);
+      currentPage = 1;
+
+      renderTVForPage(currentPage);
+      updatePagination();
+    } catch (err) {
+      console.error('Error fetching TV shows:', err);
+      grid.innerHTML = `<p class="text-gray-400 col-span-full text-center">Failed to load TV shows.</p>`;
+    }
+  }
+
+  // --- Render TV shows ---
+  function renderTVForPage(page) {
+  const start = (page - 1) * showsPerPage;
+  const shows = allTV.slice(start, start + showsPerPage);
+
+  if (!shows.length) {
+    grid.innerHTML = `<p class="text-gray-400 col-span-full text-center">No TV shows found.</p>`;
+    return;
+  }
+
+  grid.innerHTML = shows.map(item => {
+    const title = item.name || 'Untitled';
+    const poster = item.poster_path ? `${IMG_URL}${item.poster_path}` : 'https://placehold.co/400x600?text=No+Image';
+    const year = item.first_air_date ? new Date(item.first_air_date).getFullYear() : '';
+    const formattedTitle = year ? `${title} (${year})` : title;
+
+    const rating = item.vote_average ? item.vote_average * 10 : 0;
+    const color = rating < 50 ? 'red' : rating < 85 ? 'yellow' : 'green';
+    const radius = 18;
+    const circumference = 2 * Math.PI * radius;
+    const offset = circumference - (rating / 100) * circumference;
+
+    const inWatchlist = isInList('watchlist', item.id);
+    const inWatched = isInList('watched', item.id);
+
+    return `
+      <div class="group relative">
+        <div class="relative overflow-hidden rounded-lg shadow-lg">
+          <a href="detail.html?id=${item.id}&type=tv">
+            <img src="${poster}" alt="${title}" class="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-110">
+          </a>
+
+          <!-- Top-left: Rating circle (unchanged) -->
+          <div class="absolute top-2 left-2">
+            <svg class="w-10 h-10" viewBox="0 0 40 40">
+              <circle cx="20" cy="20" r="${radius}" stroke="rgba(255,255,255,0.25)" stroke-width="4" fill="rgba(0,0,0,0.6)" />
+              <circle cx="20" cy="20" r="${radius}" stroke="${color}" stroke-width="4" fill="none"
+                stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round"
+                transform="rotate(-90 20 20)" />
+              <text x="50%" y="50%" text-anchor="middle" dy="0.35em" fill="white" font-size="12">${rating.toFixed(0)}%</text>
+            </svg>
+          </div>
+
+          <!-- Top-right: Watchlist & Watched -->
+          <div class="absolute top-2 right-2 flex flex-col gap-1">
+            <button class="watchlist-btn p-1.5 rounded-md ${inWatchlist ? 'bg-red-600' : 'bg-gray-800 hover:bg-red-600'}" data-id="${item.id}" title="Watchlist">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-4 h-4" viewBox="0 0 24 24">
+                <path d="M5 3a2 2 0 0 0-2 2v16l9-4 9 4V5a2 2 0 0 0-2-2H5z"/>
+              </svg>
+            </button>
+
+            <button class="watched-btn p-1.5 rounded-md ${inWatched ? 'bg-green-600' : 'bg-gray-800 hover:bg-green-600'}" data-id="${item.id}" title="${inWatched ? 'Viewed ✅' : 'Mark as Watched 👁️'}">
+              ${inWatched 
+                ? `<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-4 h-4" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>` 
+                : `<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" class="w-4 h-4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7z"/></svg>`}
+            </button>
+          </div>
+        </div>
+        <p class="mt-2 text-sm font-medium text-center">${formattedTitle}</p>
+      </div>
+    `;
+  }).join('');
+
+  // --- Bind buttons ---
+  grid.querySelectorAll('.watchlist-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const id = parseInt(btn.dataset.id);
+      const show = allTV.find(m => m.id === id);
+      toggleInList('watchlist', show);
+      renderTVForPage(currentPage);
+    });
+  });
+
+  grid.querySelectorAll('.watched-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const id = parseInt(btn.dataset.id);
+      const show = allTV.find(m => m.id === id);
+      toggleInList('watched', show);
+      renderTVForPage(currentPage);
+    });
+  });
+}
+
+
+  // --- Sorting ---
+  sortSelect.addEventListener('change', () => {
+    const val = sortSelect.value;
+    if (val === 'az') allTV.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    else if (val === 'za') allTV.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
+    else if (val === 'rating') allTV.sort((a, b) => (b.vote_average || 0) - (a.vote_average || 0));
+    else if (val === 'year') allTV.sort((a, b) => (b.first_air_date || '').localeCompare(a.first_air_date || ''));
+
+    currentPage = 1;
+    renderTVForPage(currentPage);
+    updatePagination();
+  });
+
+  // --- Pagination ---
+  function updatePagination() {
+    pageIndicator.textContent = `Page ${currentPage} of ${totalPages}`;
+    prevBtn.disabled = currentPage <= 1;
+    nextBtn.disabled = currentPage >= totalPages;
+  }
+
+  prevBtn.addEventListener('click', () => {
+    if (currentPage > 1) {
+      currentPage--;
+      renderTVForPage(currentPage);
+      updatePagination();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  });
+
+  nextBtn.addEventListener('click', () => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderTVForPage(currentPage);
+      updatePagination();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  });
+
+  // --- Initial fetch ---
+  fetchAllTV();
+});

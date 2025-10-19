@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie Details – CineScope</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body class="bg-black text-white">
+
+  <!-- Header -->
+  <div id="header-placeholder"></div>
+
+  <main id="movieDetails" class="container mx-auto px-4 py-16">
+    <p class="text-center text-gray-400">Loading movie details...</p>
+  </main>
+
+  <footer class="bg-gray-900 border-t border-gray-800 py-8 text-center text-gray-400 text-sm">
+    © 2025 CineScope. All Rights Reserved.
+  </footer>
+
+  <!-- Header loader -->
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const headerPlaceholder = document.getElementById("header-placeholder");
+      const res = await fetch("../components/header.html");
+      const html = await res.text();
+      headerPlaceholder.innerHTML = html;
+    });
+  </script>
+
+<!-- Movie details script -->
+<script src="../js/header.js"></script>
+<script src="../js/script.js" defer></script>
+<script src="../js/detail.js"></script>
+
+</body>
+</html>
