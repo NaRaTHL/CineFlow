@@ -16,179 +16,165 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // --- Load Data from LocalStorage ---
-  const watched = JSON.parse(localStorage.getItem('watched')) || [];
-  const rated = JSON.parse(localStorage.getItem('ratedMovies')) || [];
-  const watchlist = JSON.parse(localStorage.getItem('watchlist')) || [];
+  // --- Load Data ---
+const watched = JSON.parse(localStorage.getItem('watched')) || [];
+const rated = JSON.parse(localStorage.getItem('ratedMovies')) || [];
+const watchlist = JSON.parse(localStorage.getItem('watchlist')) || [];
 
-  renderSection('history', watched, true);
-  renderSection('rated', rated, true);
-  renderSection('watchlist', watchlist, false);
+// Combine watched + rated into portfolio
+const portfolio = watched.map(movie => {
+  const ratedMatch = rated.find(r => r.id === movie.id);
+  return ratedMatch ? { ...movie, ...ratedMatch } : movie;
+});
 
-  // --- Render a section ---
-  function renderSection(id, movies, showRating = false) {
-    const container = document.getElementById(id);
+// Render portfolio immediately
+renderPortfolio(portfolio);
 
-    if (!movies.length) {
-      container.innerHTML = `<p class="col-span-full text-gray-400 text-center">No movies yet.</p>`;
-      return;
+// Render watchlist **only when its tab is clicked**
+tabs.forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (btn.dataset.tab === 'watchlist') {
+      renderWatchlist(watchlist);
     }
+  });
+});
 
-    container.innerHTML = '';
-    // Create grid wrapper
-    const grid = document.createElement('div');
-    grid.className = id === 'rated'
-      ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'
-      : 'grid grid-cols-2 md:grid-cols-4 gap-4';
-
-
-    movies.forEach(movie => {
-      const poster = movie.poster_path
-        ? `${IMG_URL}${movie.poster_path}`
-        : 'https://placehold.co/400x600?text=No+Image';
-      const title = movie.title || movie.name || 'Untitled';
-      const year = movie.release_date
-        ? new Date(movie.release_date).getFullYear()
-        : movie.first_air_date
-        ? new Date(movie.first_air_date).getFullYear()
-        : '';
-      const formattedTitle = year ? `${title} (${year})` : title;
-      const type = movie.title ? 'movie' : 'tv';
-      const basePath = window.location.pathname.includes('/page/') ? '../' : './';
-
-      // Movie card HTML
-        const card = document.createElement('div');
-
-        // Custom layout for the Rated section
-        if (id === 'rated') {
-          card.className = 'relative bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition transform hover:scale-105';
-          card.innerHTML = `
-            <div class="relative">
-              <img src="${poster}" alt="${title}" class="w-full object-cover">
-
-              <!-- Blue rating circle at top-right -->
-              <div class="absolute top-2 right-2 w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-sm font-bold text-white shadow-md">
-                ${movie.userRating ?? '–'}
-              </div>
-
-              <!-- Remove button at top-left -->
-              <button class="absolute top-2 left-2 bg-red-600 px-2 py-1 rounded-md text-xs font-semibold text-white hover:bg-red-700 transition remove-rated-btn">
-                ✕
-              </button>
-            </div>
-
-            <div class="p-3">
-              <h3 class="text-sm font-semibold text-white mb-2">${formattedTitle}</h3>
-
-              <!-- Watched date -->
-              <p class="text-gray-300 text-xs mb-1">
-                ${movie.watchedDate ? `Watched: ${movie.watchedDate}` : '–'}
-              </p>
-
-              <!-- Comment -->
-              <p class="italic text-gray-400 text-xs">
-                ${movie.userComment ? `"${movie.userComment}"` : 'No comment'}
-              </p>
-            </div>
-          `;
-
-          // Add remove button functionality
-            const removeBtn = card.querySelector('.remove-rated-btn');
-            removeBtn.addEventListener('click', e => {
-              e.preventDefault();
-              e.stopPropagation();
-
-              // Remove from ratedMovies
-              const updatedList = movies.filter(m => m.id !== movie.id);
-              localStorage.setItem('ratedMovies', JSON.stringify(updatedList));
-
-              // Update watched history: mark as not reviewed
-              const watchedHistory = JSON.parse(localStorage.getItem('watched')) || [];
-              const updatedHistory = watchedHistory.map(m => {
-                if (m.id === movie.id) {
-                  return { ...m, reviewed: false }; // optional flag if you track review status
-                }
-                return m;
-              });
-              localStorage.setItem('watched', JSON.stringify(updatedHistory));
-
-              // Re-render sections
-              renderSection('rated', updatedList, true);
-              renderSection('history', updatedHistory, true);
-            });
-        }
-
- else {
-          // Default layout (for watched, watchlist, etc.)
-          card.className = 'relative group';
-          card.innerHTML = `
-            <a href="${basePath}page/detail.html?id=${movie.id}&type=${type}" class="block">
-              <div class="relative overflow-hidden rounded-lg shadow-lg">
-                <img src="${poster}" alt="${title}" class="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-110">
-              </div>
-              <p class="mt-2 text-sm font-medium text-center">${formattedTitle}</p>
-              ${
-                showRating && movie.userRating
-                  ? `
-                    <div class="text-xs text-gray-400 text-center mt-1">
-                      ${movie.userRating}/100
-                      ${movie.watchedDate ? `<p class="mt-1 text-gray-500">📅 Watched: ${movie.watchedDate}</p>` : ''}
-                      ${movie.userComment ? `<p class="italic mt-1 text-gray-500">"${movie.userComment}"</p>` : ''}
-                    </div>
-                  `
-                  : ''
-              }
-            </a>
-          `;
-        }
-      // Add remove button for Watchlist
-      if (id === 'watchlist') {
-        const removeBtn = document.createElement('button');
-        removeBtn.textContent = '✕';
-        removeBtn.className = 'remove-btn absolute top-2 right-2 bg-red-600 p-1 rounded-md text-white';
-        removeBtn.addEventListener('click', e => {
-          e.preventDefault();
-          e.stopPropagation();
-          const updatedList = movies.filter(m => m.id !== movie.id);
-          localStorage.setItem('watchlist', JSON.stringify(updatedList));
-          renderSection('watchlist', updatedList, false);
-        });
-        card.appendChild(removeBtn);
-      }
-
-      // Add review button for watched movies
-      if (id === 'history') {
-        const ratedMovies = JSON.parse(localStorage.getItem('ratedMovies')) || [];
-        const alreadyReviewed = ratedMovies.some(r => r.id === movie.id);
-
-        const reviewBtn = document.createElement('button');
-        reviewBtn.textContent = alreadyReviewed ? 'Reviewed' : '✎ Review';
-        reviewBtn.className = alreadyReviewed
-          ? 'absolute top-2 right-2 bg-green-600 px-2 py-1 rounded-md text-xs font-semibold text-white cursor-default'
-          : 'absolute top-2 right-2 bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded-md text-xs font-semibold text-white transition';
-
-        if (!alreadyReviewed) {
-          reviewBtn.addEventListener('click', e => {
-            e.preventDefault();
-            e.stopPropagation();
-            openReviewModal(movie);
-          });
-        } else {
-          // Optionally allow editing reviewed movies:
-          reviewBtn.addEventListener('click', e => {
-            e.preventDefault();
-            e.stopPropagation();
-            openReviewModal(movie, true); // Pass edit mode
-          });
-        }
-
-        card.appendChild(reviewBtn);
-      }
-
-
-      container.appendChild(card);
-    });
-    
+// --- Portfolio Renderer ---
+function renderPortfolio(movies) {
+  const container = document.getElementById('portfolio');
+  if (!movies.length) {
+    container.innerHTML = `<p class="text-gray-400 text-center">No movies in your portfolio yet.</p>`;
+    return;
   }
+
+  container.innerHTML = '';
+
+  // 2 movies per row grid
+  container.className = "grid grid-cols-1 md:grid-cols-2 gap-8";
+
+  movies.forEach(movie => {
+    const poster = movie.poster_path
+      ? `${IMG_URL}${movie.poster_path}`
+      : 'https://placehold.co/400x600?text=No+Image';
+    const title = movie.title || movie.name || 'Untitled';
+    const year = movie.release_date
+      ? new Date(movie.release_date).getFullYear()
+      : movie.first_air_date
+      ? new Date(movie.first_air_date).getFullYear()
+      : '';
+    const formattedTitle = year ? `${title} (${year})` : title;
+
+    const review = movie.userRating
+      ? `
+        <div class="space-y-2">
+          <p class="text-sm"><span class="font-semibold text-red-500">Rating:</span> ${movie.userRating}/100</p>
+          <p class="text-sm text-gray-400">📅 ${movie.watchedDate || 'Unknown date'}</p>
+          <p class="italic text-gray-400">"${movie.userComment || 'No comment'}"</p>
+        </div>
+      `
+      : `<p class="text-gray-400 italic text-sm">No review yet.</p>`;
+
+    const card = document.createElement('div');
+    card.className =
+  "bg-gray-900 p-4 rounded-lg shadow-lg hover:shadow-xl transition";
+
+card.innerHTML = `
+  <div class="flex gap-4">
+    <!-- Poster -->
+    <div class="flex-shrink-0">
+      <img src="${poster}" alt="${title}" class="w-60 h-80 rounded-lg object-cover">
+    </div>
+
+    <!-- Details -->
+    <div class="flex flex-col justify-between flex-1">
+      <div>
+        <!-- Title: limit to 2 lines -->
+        <h3 class="text-xl font-semibold mb-2 line-clamp-2 h-20 overflow-hidden">
+          ${formattedTitle}
+        </h3>
+
+        <!-- Review info starts below title -->
+        <div class="mt-1">
+          ${review}
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <button class="review-btn px-3 py-1 rounded text-sm font-semibold ${
+          movie.userRating ? 'bg-blue-600 hover:bg-blue-700' : 'bg-orange-500 hover:bg-orange-600'
+        }">
+          ✎ ${movie.userRating ? 'Edit Review' : 'Add Review'}
+        </button>
+         <button class="remove-portfolio-btn px-3 py-1 rounded text-sm font-semibold bg-red-600 hover:bg-red-700 text-white">
+          ✕ Remove
+        </button>
+      </div>
+    </div>
+  </div>
+`;
+    const reviewBtn = card.querySelector('.review-btn');
+    reviewBtn.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      openReviewModal(movie, !!movie.userRating);
+    });
+
+    container.appendChild(card);
+
+    const removeBtn = card.querySelector('.remove-portfolio-btn');
+    removeBtn.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      openRemoveModal(movie);
+    });
+
+  });
+}
+
+// --- Watchlist Renderer ---
+function renderWatchlist(movies) {
+  const container = document.getElementById('watchlist');
+  if (!movies.length) {
+    container.innerHTML = `<p class="col-span-full text-gray-400 text-center">No movies in your watchlist.</p>`;
+    return;
+  }
+
+  container.innerHTML = '';
+  container.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6';
+
+  movies.forEach(movie => {
+    const poster = movie.poster_path
+      ? `${IMG_URL}${movie.poster_path}`
+      : 'https://placehold.co/400x600?text=No+Image';
+    const title = movie.title || movie.name || 'Untitled';
+    const year = movie.release_date
+      ? new Date(movie.release_date).getFullYear()
+      : '';
+    const formattedTitle = year ? `${title} (${year})` : title;
+
+    const card = document.createElement('div');
+    card.className = 'relative group';
+    card.innerHTML = `
+      <div class="relative overflow-hidden rounded-lg shadow-lg">
+        <img src="${poster}" alt="${title}" class="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-110">
+      </div>
+      <p class="mt-2 text-sm font-medium text-center">${formattedTitle}</p>
+      <button class="remove-btn absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white text-xs px-2 py-1 rounded hidden group-hover:block">
+        ✕ Remove
+      </button>
+    `;
+
+    const removeBtn = card.querySelector('.remove-btn');
+    removeBtn.addEventListener('click', () => {
+      const updatedList = movies.filter(m => m.id !== movie.id);
+      localStorage.setItem('watchlist', JSON.stringify(updatedList));
+      renderWatchlist(updatedList);
+    });
+
+    container.appendChild(card);
+  });
+}
+
   // --- Review Modal Logic ---
   const modal = document.getElementById('reviewModal');
   const closeModalBtn = document.getElementById('closeModal');
@@ -223,48 +209,102 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.classList.add('hidden');
   });
 
-  saveReviewBtn.addEventListener('click', () => {
-    const rating = parseInt(ratingInput.value);
-    const comment = commentInput.value.trim();
-    const watchedDate = watchedDateInput.value;
+  function closeReviewModal() {
+  modal.classList.add('hidden');
+  ratingInput.value = '';
+  commentInput.value = '';
+  watchedDateInput.value = '';
+  currentMovie = null;
+}
 
-    if (isNaN(rating) || rating < 0 || rating > 100) {
-      alert('Please enter a rating between 0 and 100.');
-      return;
-    }
 
-    if (!comment) {
-      alert('Please write a comment.');
-      return;
-    }
+  document.getElementById("saveReview").addEventListener("click", () => {
+  const watchedDate = document.getElementById("watchedDate").value;
+  const userRating = document.getElementById("userRating").value;
+  const userComment = document.getElementById("userComment").value;
 
-    if (!watchedDate) {
-      alert('Please select the watched date.');
-      return;
-    }
+  if (!currentMovie) return;
 
-    // Save to ratedMovies
-    const ratedMovies = JSON.parse(localStorage.getItem('ratedMovies')) || [];
-    const existing = ratedMovies.find(m => m.id === currentMovie.id);
+  // Load from localStorage
+  let watched = JSON.parse(localStorage.getItem("watched")) || [];
+  let rated = JSON.parse(localStorage.getItem("ratedMovies")) || [];
 
-    if (existing) {
-      existing.userRating = rating;
-      existing.userComment = comment;
-      existing.watchedDate = watchedDate;
-    } else {
-      ratedMovies.push({
-        ...currentMovie,
-        userRating: rating,
-        userComment: comment,
-        watchedDate: watchedDate
-      });
-    }
+  // Update or add to watched
+  const watchedIndex = watched.findIndex(m => m.id === currentMovie.id);
+  const movieData = {
+    ...currentMovie,
+    watchedDate,
+    userRating,
+    userComment
+  };
 
-    localStorage.setItem('ratedMovies', JSON.stringify(ratedMovies));
-    modal.classList.add('hidden');
+  if (watchedIndex >= 0) {
+    watched[watchedIndex] = movieData;
+  } else {
+    watched.push(movieData);
+  }
 
-    // Re-render the rated section
-    renderSection('rated', ratedMovies, true);
-    renderSection('history', JSON.parse(localStorage.getItem('watched')) || [], true);
+  // Update or add to rated
+  const ratedIndex = rated.findIndex(m => m.id === currentMovie.id);
+  if (ratedIndex >= 0) {
+    rated[ratedIndex] = movieData;
+  } else {
+    rated.push(movieData);
+  }
+
+  // Save back to localStorage
+  localStorage.setItem("watched", JSON.stringify(watched));
+  localStorage.setItem("ratedMovies", JSON.stringify(rated));
+
+  // Close modal and refresh portfolio
+  closeReviewModal();
+  const portfolio = watched.map(movie => {
+    const ratedMatch = rated.find(r => r.id === movie.id);
+    return ratedMatch ? { ...movie, ...ratedMatch } : movie;
   });
+  renderPortfolio(portfolio);
+});
+
+// --- Remove Modal Logic ---
+const removeModal = document.getElementById('removeModal');
+const confirmRemoveBtn = document.getElementById('confirmRemove');
+const cancelRemoveBtn = document.getElementById('cancelRemove');
+let movieToRemove = null;
+
+function openRemoveModal(movie) {
+  movieToRemove = movie;
+  removeModal.classList.remove('hidden');
+}
+
+function closeRemoveModal() {
+  movieToRemove = null;
+  removeModal.classList.add('hidden');
+}
+
+cancelRemoveBtn.addEventListener('click', closeRemoveModal);
+
+confirmRemoveBtn.addEventListener('click', () => {
+  if (!movieToRemove) return;
+
+  // Remove from LocalStorage
+  let watched = JSON.parse(localStorage.getItem('watched')) || [];
+  let rated = JSON.parse(localStorage.getItem('ratedMovies')) || [];
+
+  watched = watched.filter(m => m.id !== movieToRemove.id);
+  rated = rated.filter(m => m.id !== movieToRemove.id);
+
+  localStorage.setItem('watched', JSON.stringify(watched));
+  localStorage.setItem('ratedMovies', JSON.stringify(rated));
+
+  // Re-render portfolio
+  const portfolio = watched.map(m => {
+    const ratedMatch = rated.find(r => r.id === m.id);
+    return ratedMatch ? { ...m, ...ratedMatch } : m;
+  });
+  renderPortfolio(portfolio);
+
+  closeRemoveModal();
+});
+
+
 });
