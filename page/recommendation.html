@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineScope – Personalized Recommendations (Enhanced)</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body class="bg-gray-950 text-white font-[Poppins] antialiased">
+
+  <!-- Header -->
+  <div id="header-placeholder"></div>
+
+  <br><br>
+
+  <!-- Quiz Section -->
+  <main class="container mx-auto px-4 py-16">
+    <section id="questionnaire" class="max-w-2xl mx-auto bg-gray-900 p-8 rounded-2xl shadow-xl space-y-8">
+      <h1 class="text-4xl font-bold text-center text-red-500 mb-6">Personalized Recommendations</h1>
+
+      <!-- STEP 1 -->
+      <div class="question-step">
+        <label class="block mb-2 font-semibold">What do you want to watch?</label>
+        <select id="typeSelect" class="w-full p-3 rounded-md bg-gray-800 focus:ring-2 focus:ring-red-500">
+          <option value="movie">Movies</option>
+          <option value="tv">TV Shows</option>
+        </select>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="question-step hidden">
+        <label class="block mb-2 font-semibold">What genre do you prefer?</label>
+        <select id="genreSelect" class="w-full p-3 rounded-md bg-gray-800 focus:ring-2 focus:ring-red-500">
+          <option value="">Select Genre</option>
+          <option value="28">Action</option>
+          <option value="35">Comedy</option>
+          <option value="18">Drama</option>
+          <option value="10749">Romance</option>
+          <option value="27">Horror</option>
+          <option value="878">Science Fiction</option>
+          <option value="16">Animation</option>
+          <option value="99">Documentary</option>
+        </select>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="question-step hidden">
+        <label class="block mb-2 font-semibold">Violence & Darkness</label>
+        <select id="violenceSelect" class="w-full p-3 rounded-md bg-gray-800 focus:ring-2 focus:ring-red-500">
+          <option value="">Anything is fine</option>
+          <option value="light">Keep it light (no crime/war/horror)</option>
+          <option value="mild">Mild dark themes are okay</option>
+          <option value="dark">Dark / intense / disturbing is fine</option>
+        </select>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="question-step hidden">
+        <label class="block mb-2 font-semibold">Pacing preference</label>
+        <select id="pacingSelect" class="w-full p-3 rounded-md bg-gray-800 focus:ring-2 focus:ring-red-500">
+          <option value="">Any</option>
+          <option value="slow">Slow & Atmospheric</option>
+          <option value="balanced">Balanced</option>
+          <option value="fast">Fast / No downtime</option>
+        </select>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="question-step hidden">
+        <label class="block mb-2 font-semibold">What mood are you in?</label>
+        <select id="moodSelect" class="w-full p-3 rounded-md bg-gray-800 focus:ring-2 focus:ring-red-500">
+          <option value="">Select Mood</option>
+          <option value="feel-good">Feel Good 😊</option>
+          <option value="exciting">Exciting ⚡</option>
+          <option value="romantic">Romantic 💕</option>
+          <option value="dark">Dark & Intense 🌑</option>
+          <option value="mystery">Mysterious 🕵️‍♂️</option>
+        </select>
+      </div>
+
+      <!-- STEP 6 -->
+      <div class="question-step hidden">
+        <label class="block mb-2 font-semibold">Fame Level</label>
+        <select id="fameSelect" class="w-full p-3 rounded-md bg-gray-800 focus:ring-2 focus:ring-red-500">
+          <option value="">Anything</option>
+          <option value="popular">Well-known / Trending</option>
+          <option value="hidden">Hidden gem (underrated)</option>
+        </select>
+      </div>
+
+      <!-- STEP 7 -->
+      <div class="question-step hidden">
+        <label class="block mb-2 font-semibold">Preferred release decade?</label>
+        <select id="decadeSelect" class="w-full p-3 rounded-md bg-gray-800 focus:ring-2 focus:ring-red-500">
+          <option value="">Any</option>
+          <option value="2020">2020s</option>
+          <option value="2010">2010s</option>
+          <option value="2000">2000s</option>
+          <option value="1990">1990s</option>
+          <option value="1980">1980s</option>
+        </select>
+      </div>
+
+      <!-- Navigation Buttons -->
+      <div id="navButtons" class="flex justify-between items-center mt-6">
+        <button id="prevBtn" class="bg-gray-700 hover:bg-gray-600 px-6 py-2 rounded-full font-semibold transition invisible">
+          Previous
+        </button>
+
+        <button id="nextBtn" class="bg-red-600 hover:bg-red-700 px-6 py-2 rounded-full font-semibold transition">
+          Next
+        </button>
+      </div>
+
+      <!-- Reset + Recommend Buttons -->
+      <div class="flex flex-col items-center space-y-4 mt-8">
+        <button id="recommendBtn" class="bg-red-600 hover:bg-red-700 px-8 py-3 rounded-full font-semibold transition hidden">
+          Show Recommendations
+        </button>
+
+        <button id="resetBtn" class="text-gray-400 hover:text-white text-sm underline transition">
+          Reset Quiz
+        </button>
+      </div>
+    </section>
+
+    <!-- Results -->
+    <section id="recommendationResults" class="hidden mt-16">
+      <h2 class="text-3xl font-semibold mb-6 text-center">Your Recommendations</h2>
+      <div id="recommendationGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6"></div>
+
+      <!-- Load More Button -->
+      <div class="text-center mt-8">
+        <button id="loadMoreBtn" class="bg-gray-800 hover:bg-gray-700 px-6 py-2 rounded-full font-semibold hidden">
+          Load More
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 border-t border-gray-800 py-8 text-center text-gray-400 text-sm">
+    © 2025 CineScope. All Rights Reserved.
+  </footer>
+
+  <!-- JS -->
+  <script src="../js/header.js" defer></script>
+  <script src="../js/recommendation.js" defer></script>
+
+  <script>
+    const steps = document.querySelectorAll('.question-step');
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const recommendBtn = document.getElementById('recommendBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const resultsSection = document.getElementById('recommendationResults');
+    let currentStep = 0;
+
+    function showStep(index) {
+      steps.forEach((step, i) => {
+        step.classList.toggle('hidden', i !== index);
+      });
+      if (index === 0) prevBtn.classList.add('invisible');
+      else prevBtn.classList.remove('invisible');
+
+      nextBtn.classList.toggle('hidden', index === steps.length - 1);
+      recommendBtn.classList.toggle('hidden', index !== steps.length - 1);
+    }
+
+    nextBtn.addEventListener('click', () => {
+      if (currentStep < steps.length - 1) {
+        currentStep++;
+        showStep(currentStep);
+      }
+    });
+
+    prevBtn.addEventListener('click', () => {
+      if (currentStep > 0) {
+        currentStep--;
+        showStep(currentStep);
+      }
+    });
+
+    resetBtn.addEventListener('click', () => {
+      currentStep = 0;
+      showStep(currentStep);
+      document.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
+      resultsSection.classList.add('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    showStep(currentStep);
+  </script>
+</body>
+</html>

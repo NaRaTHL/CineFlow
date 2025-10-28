@@ -18,3 +18,16 @@ body {
   background-size: cover;
   background-position: center;
 }
+
+/* Smooth sliding effect for button */
+.group:hover span:first-child {
+  transform: translateX(0);
+}
+
+.group span:first-child {
+  transform: translateX(-100%);
+}
+
+.group:hover span:nth-child(2) {
+  transform: translateX(100%);
+}
