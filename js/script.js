@@ -142,30 +142,25 @@ function renderMovies(movies, containerId, startIndex = 0) {
   });
 }
 
-
-
-let movieCache = { recommended: [], popular: [], upcoming: [], tvshows: [] };
-let movieIndex = { recommended: 0, popular: 0, upcoming: 0, tvshows: 0 };
+let movieCache = { recommended: [], popular: [], tvshows: [] };
+let movieIndex = { recommended: 0, popular: 0, tvshows: 0 };
 
 async function loadAllMovies() {
-  const [recommended, popular, upcoming, tvshows] = await Promise.all([
-    fetchMovies('/movie/top_rated'),
-    fetchMovies('/movie/popular'),
-    fetchMovies('/movie/upcoming'),
-    fetchMovies('/tv/popular')
-  ]);
+  const [recommended, popular, tvshows] = await Promise.all([
+  fetchMovies('/movie/top_rated'),
+  fetchMovies('/movie/popular'),
+  fetchMovies('/tv/popular')
+]);
 
-  movieCache = {
-    recommended: recommended.slice(0, 14),
-    popular: popular.slice(0, 14),
-    upcoming: upcoming.slice(0, 14),
-    tvshows: tvshows.slice(0, 14)
-  };
+movieCache = {
+  recommended: recommended.slice(0, 14),
+  popular: popular.slice(0, 14),
+  tvshows: tvshows.slice(0, 14)
+};
 
-  renderMovies(movieCache.recommended, 'recommended', 0);
-  renderMovies(movieCache.popular, 'popular', 0);
-  renderMovies(movieCache.upcoming, 'upcoming', 0);
-  renderMovies(movieCache.tvshows, 'tvshows', 0);
+renderMovies(movieCache.recommended, 'recommended', 0);
+renderMovies(movieCache.popular, 'popular', 0);
+renderMovies(movieCache.tvshows, 'tvshows', 0);
 }
 
 document.addEventListener('click', (e) => {
