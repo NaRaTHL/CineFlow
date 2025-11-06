@@ -76,15 +76,26 @@ document.addEventListener("DOMContentLoaded", async () => {
           </p>`
         : "";
 
+    // ===== Build HTML =====
     detailsContainer.innerHTML = `
       <section class="flex flex-col md:flex-row gap-10">
         <img src="${poster}" alt="${title}"
           class="w-full md:w-1/3 lg:w-1/4 max-h-[600px] object-cover rounded-2xl shadow-2xl mx-auto md:mx-0">
 
         <div class="flex-1">
-          <h1 class="text-4xl font-bold mb-2">${title}</h1>
-          <p class="text-gray-400 mb-2">${releaseYear} • ${genres}</p>
+          <h1 class="text-4xl font-bold mb-1">${title}</h1>
+
+          <!-- Rating, Release Year, and Genres -->
+          <p class="text-gray-400 mb-3 flex items-center gap-2">
+            <span class="text-white-500 font-semibold">
+              ${details.vote_average ? Math.round(details.vote_average * 10) : "N/A"}/100
+            </span>
+            <span>• ${releaseYear}</span>
+            <span>• ${genres}</span>
+          </p>
+
           ${extraInfo}
+
           <p class="text-gray-300 leading-relaxed mb-6">${overview}</p>
 
           <!-- Buttons -->
